@@ -51,7 +51,7 @@ app.post('/reserve', async (req, res) => {
         );
 
         // 3. ส่งผลลัพธ์กลับไปบอกหน้าบ้าน
-        res.status(201).json({
+        res.json({
             message: "จองคิวสำเร็จ!",
             data: result.rows[0]
         });
