@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue System API Documentation</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background-color: #f8f9fa; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .base-url { background: #e9ecef; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 1.1em; margin-bottom: 30px; }
+        
+        .endpoint { border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px; overflow: hidden; }
+        .endpoint-header { padding: 15px; background: #f8f9fa; display: flex; align-items: center; border-bottom: 1px solid #ddd; cursor: pointer; }
+        .method { padding: 5px 10px; border-radius: 5px; font-weight: bold; color: white; margin-right: 15px; font-size: 0.9em; min-width: 60px; text-align: center; }
+        .method.get { background-color: #61affe; }
+        .method.post { background-color: #49cc90; }
+        .method.patch { background-color: #fca130; }
+        .url { font-family: monospace; font-size: 1.1em; font-weight: bold; color: #333; }
+        .desc { margin-left: auto; color: #666; font-size: 0.9em; }
+        
+        .endpoint-body { padding: 20px; background: #fff; }
+        h4 { margin-top: 0; color: #2c3e50; }
+        pre { background: #282c34; color: #abb2bf; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #eee; }
+        th { background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📚 Queue System API Documentation</h1>
+    <p>เอกสารคู่มือการใช้งาน API สำหรับระบบจัดการคิว (Queue System)</p>
+    
+    <div class="base-url">
+        <strong>Base URL:</strong> <code>http://localhost</code> 
+        <span style="color:#666; font-size:0.9em;">(หรือ http://localhost:3000 หากไม่ได้ผ่าน Nginx)</span>
+    </div>
+
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method post">POST</span>
+            <span class="url">/reserve</span>
+            <span class="desc">จองคิวใหม่</span>
+        </div>
+        <div class="endpoint-body">
+            <h4>📝 รายละเอียด</h4>
+            <p>ใช้สำหรับให้ลูกค้ากดรับบัตรคิว ระบบจะรันหมายเลขคิวให้อัตโนมัติ</p>
+            <h4>📦 Request Body (JSON)</h4>
+            <pre><code>{
+  "name": "ชื่อลูกค้า (String)"
+}</code></pre>
+            <h4>✅ Example Response (200 OK)</h4>
+            <pre><code>{
+  "message": "จองคิวสำเร็จ!",
+  "data": {
+    "id": 1,
+    "customer_name": "สมชาย",
+    "queue_number": 1,
+    "status": "waiting",
+    "counter_number": null,
+    "created_at": "2023-10-25T10:00:00.000Z"
+  }
+}</code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method patch">PATCH</span>
+            <span class="url">/call-next</span>
+            <span class="desc">เรียกคิวถัดไป</span>
+        </div>
+        <div class="endpoint-body">
+            <h4>📝 รายละเอียด</h4>
+            <p>เจ้าหน้าที่กดปุ่มเพื่อเรียกคิวถัดไปที่รออยู่ (สถานะ waiting -> called) โดยต้องส่งหมายเลขช่องบริการมาด้วย</p>
+            <h4>📦 Request Body (JSON)</h4>
+            <pre><code>{
+  "counter_number": 1
+}</code></pre>
+            <h4>✅ Example Response (200 OK)</h4>
+            <pre><code>{
+  "message": "เรียกคิวสำเร็จ",
+  "data": {
+    "id": 1,
+    "customer_name": "สมชาย",
+    "queue_number": 1,
+    "status": "called",
+    "counter_number": 1,
+    "created_at": "2023-10-25T10:00:00.000Z"
+  }
+}</code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method get">GET</span>
+            <span class="url">/queues/active</span>
+            <span class="desc">ดึงข้อมูลคิวที่กำลังเรียก (สำหรับหน้าจอ TV)</span>
+        </div>
+        <div class="endpoint-body">
+            <h4>📝 รายละเอียด</h4>
+            <p>ดึงรายการคิวล่าสุด 5 คิว ที่กำลังถูกเรียกไปที่ช่องบริการต่างๆ เพื่อนำไปแสดงผลบนหน้าจอ Display</p>
+            <h4>✅ Example Response (200 OK)</h4>
+            <pre><code>[
+  {
+    "queue_number": 1,
+    "counter_number": 1
+  },
+  {
+    "queue_number": 2,
+    "counter_number": 2
+  }
+]</code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method get">GET</span>
+            <span class="url">/queues/waiting</span>
+            <span class="desc">ดึงรายการคิวที่รออยู่ทั้งหมด</span>
+        </div>
+        <div class="endpoint-body">
+            <h4>📝 รายละเอียด</h4>
+            <p>ดึงรายการคิวที่มีสถานะเป็น 'waiting' เรียงตามลำดับหมายเลขคิว</p>
+            <h4>✅ Example Response (200 OK)</h4>
+            <pre><code>[
+  {
+    "id": 3,
+    "customer_name": "สมหญิง",
+    "queue_number": 3,
+    "status": "waiting",
+    "counter_number": null,
+    "created_at": "2023-10-25T10:05:00.000Z"
+  }
+]</code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <div class="endpoint-header">
+            <span class="method get">GET</span>
+            <span class="url">/reserve/:id</span>
+            <span class="desc">ค้นหาคิวด้วย ID</span>
+        </div>
+        <div class="endpoint-body">
+            <h4>📝 รายละเอียด</h4>
+            <p>ดึงข้อมูลรายละเอียดของคิวที่ต้องการ โดยระบุ <code>id</code> ต่อท้าย URL</p>
+            <h4>✅ Example Response (200 OK)</h4>
+            <pre><code>{
+  "id": 1,
+  "customer_name": "สมชาย",
+  "queue_number": 1,
+  "status": "called",
+  "counter_number": 1,
+  "created_at": "2023-10-25T10:00:00.000Z"
+}</code></pre>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
